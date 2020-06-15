@@ -1245,6 +1245,9 @@ $biaya_penelitian = $worksheet_penggunaan_dana3->rangeToArray('B3:I3', NULL, TRU
 $biaya_pkm = $worksheet_penggunaan_dana3->rangeToArray('B2:I2', NULL, TRUE, TRUE, TRUE);
 $biaya_investasi = $worksheet_penggunaan_dana3->rangeToArray('B7:I9', NULL, TRUE, TRUE, TRUE);
 
+$spreadsheet_penggunaan_dana2->disconnectWorksheets();
+unset($spreadsheet_penggunaan_dana2);
+
 
 /**
  * Tabel 5.a Kurikulum, Capaian Pembelajaran, dan Rencana Pembelajaran
@@ -1931,10 +1934,10 @@ foreach($worksheet_masa_studi2->getRowIterator() as $row_id => $row) {
     }
 }
 
-$worksheet_masa_studi3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_masa_studi2, 'Sheet S1');
+$worksheet_masa_studi3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_masa_studi2, 'Sheet 2');
 $spreadsheet_masa_studi2->addSheet($worksheet_masa_studi3);
 
-$worksheet_masa_studi3 = $spreadsheet_masa_studi2->getSheetByName('Sheet S1');
+$worksheet_masa_studi3 = $spreadsheet_masa_studi2->getSheetByName('Sheet 2');
 $worksheet_masa_studi3->fromArray($data_masa_studi, NULL, 'A1');
 
 $highestRow_masa_studi3 = $worksheet_masa_studi3->getHighestRow();
@@ -1980,6 +1983,260 @@ $writer_masa_studi2->save('./formatted/sapto_masa_studi_lulusan (F).xls');
 
 $spreadsheet_masa_studi2->disconnectWorksheets();
 unset($spreadsheet_masa_studi2);
+
+
+/**
+ * Tabel 8.d.1 Waktu Tunggu Lulusan
+ */
+
+// Diploma
+/* $spreadsheet_waktu_tunggu_diploma = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_waktu_tunggu_lulusan_diploma.xlsx');
+
+$worksheet_waktu_tunggu_diploma = $spreadsheet_waktu_tunggu_diploma->getActiveSheet();
+
+$highestRow_waktu_tunggu_diploma = $worksheet_waktu_tunggu_diploma->getHighestRow();
+
+$worksheet_waktu_tunggu_diploma->setAutoFilter('B1:J'.$highestRow_waktu_tunggu_diploma);
+$autoFilter_waktu_tunggu_diploma = $worksheet_waktu_tunggu_diploma->getAutoFilter();
+$columnFilter_waktu_tunggu_diploma = $autoFilter_waktu_tunggu_diploma->getColumn('I');
+$columnFilter_waktu_tunggu_diploma2 = $autoFilter_waktu_tunggu_diploma->getColumn('B');
+$columnFilter_waktu_tunggu_diploma->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_diploma->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        $nama_prodi2
+    );
+$columnFilter_waktu_tunggu_diploma2->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_diploma2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-2'
+    );
+$columnFilter_waktu_tunggu_diploma2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-3'
+    );
+$columnFilter_waktu_tunggu_diploma2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-4'
+    );
+
+$autoFilter_waktu_tunggu_diploma->showHideRows();
+
+$array_waktu_tunggu_diploma = $worksheet_waktu_tunggu_diploma->toArray();
+$data_waktu_tunggu_diploma = [];
+
+foreach($worksheet_waktu_tunggu_diploma->getRowIterator() as $row_id => $row) {
+    if($worksheet_waktu_tunggu_diploma->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['tahun_lulus'] = $array_waktu_tunggu_diploma[$row_id-1][1];
+            $item['jml_lulusan'] = $array_waktu_tunggu_diploma[$row_id-1][2];
+			$item['jml_terlacak'] = $array_waktu_tunggu_diploma[$row_id-1][3];
+			$item['jml_dipesan'] = $array_waktu_tunggu_diploma[$row_id-1][4];
+			$item['kurang_3'] = $array_waktu_tunggu_diploma[$row_id-1][5];
+			$item['sampai_6'] = $array_waktu_tunggu_diploma[$row_id-1][6];
+			$item['lebih_6'] = $array_waktu_tunggu_diploma[$row_id-1][7];
+            $data_waktu_tunggu_diploma[] = $item;
+        }
+    }
+}
+
+$worksheet_waktu_tunggu_diploma2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_waktu_tunggu_diploma, 'Sheet 2');
+$spreadsheet_waktu_tunggu_diploma->addSheet($worksheet_waktu_tunggu_diploma2);
+
+$worksheet_waktu_tunggu_diploma2 = $spreadsheet_waktu_tunggu_diploma->getSheetByName('Sheet 2');
+$worksheet_waktu_tunggu_diploma2->fromArray($data_waktu_tunggu_diploma, NULL, 'A1');
+
+$writer_waktu_tunggu_diploma = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_waktu_tunggu_diploma, 'Xlsx');
+$writer_waktu_tunggu_diploma->save('./formatted/sapto_waktu_tunggu_lulusan_diploma (F).xlsx');
+
+$spreadsheet_waktu_tunggu_diploma->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_diploma);
+
+// Load Format Baru
+$spreadsheet_waktu_tunggu_diploma2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_waktu_tunggu_lulusan_diploma (F).xlsx');
+$worksheet_waktu_tunggu_diploma3 = $spreadsheet_waktu_tunggu_diploma2->getSheetByName('Sheet 2');
+
+// May be change
+$waktu_tunggu_diploma_ts2 = $worksheet_waktu_tunggu_diploma3->rangeToArray('B1:G1', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_diploma_ts3 = $worksheet_waktu_tunggu_diploma3->rangeToArray('B2:G2', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_diploma_ts4 = $worksheet_waktu_tunggu_diploma3->rangeToArray('B3:G3', NULL, TRUE, TRUE, TRUE);
+
+$spreadsheet_waktu_tunggu_diploma2->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_diploma2); */
+
+
+// Sarjana
+$spreadsheet_waktu_tunggu_sarjana = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_waktu_tunggu_lulusan_sarjana.xlsx');
+
+$worksheet_waktu_tunggu_sarjana = $spreadsheet_waktu_tunggu_sarjana->getActiveSheet();
+
+$highestRow_waktu_tunggu_sarjana = $worksheet_waktu_tunggu_sarjana->getHighestRow();
+
+$worksheet_waktu_tunggu_sarjana->setAutoFilter('B1:I'.$highestRow_waktu_tunggu_sarjana);
+$autoFilter_waktu_tunggu_sarjana = $worksheet_waktu_tunggu_sarjana->getAutoFilter();
+$columnFilter_waktu_tunggu_sarjana = $autoFilter_waktu_tunggu_sarjana->getColumn('H');
+$columnFilter_waktu_tunggu_sarjana2 = $autoFilter_waktu_tunggu_sarjana->getColumn('B');
+$columnFilter_waktu_tunggu_sarjana->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_sarjana->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        $nama_prodi2
+    );
+$columnFilter_waktu_tunggu_sarjana2->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_sarjana2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-2'
+    );
+$columnFilter_waktu_tunggu_sarjana2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-3'
+    );
+$columnFilter_waktu_tunggu_sarjana2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-4'
+    );
+
+$autoFilter_waktu_tunggu_sarjana->showHideRows();
+
+$array_waktu_tunggu_sarjana = $worksheet_waktu_tunggu_sarjana->toArray();
+$data_waktu_tunggu_sarjana = [];
+
+foreach($worksheet_waktu_tunggu_sarjana->getRowIterator() as $row_id => $row) {
+    if($worksheet_waktu_tunggu_sarjana->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['tahun_lulus'] = $array_waktu_tunggu_sarjana[$row_id-1][1];
+            $item['jml_lulusan'] = $array_waktu_tunggu_sarjana[$row_id-1][2];
+			$item['jml_terlacak'] = $array_waktu_tunggu_sarjana[$row_id-1][3];
+			$item['kurang_6'] = $array_waktu_tunggu_sarjana[$row_id-1][4];
+			$item['sampai_18'] = $array_waktu_tunggu_sarjana[$row_id-1][5];
+			$item['lebih_18'] = $array_waktu_tunggu_sarjana[$row_id-1][6];
+            $data_waktu_tunggu_sarjana[] = $item;
+        }
+    }
+}
+
+$worksheet_waktu_tunggu_sarjana2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_waktu_tunggu_sarjana, 'Sheet 2');
+$spreadsheet_waktu_tunggu_sarjana->addSheet($worksheet_waktu_tunggu_sarjana2);
+
+$worksheet_waktu_tunggu_sarjana2 = $spreadsheet_waktu_tunggu_sarjana->getSheetByName('Sheet 2');
+$worksheet_waktu_tunggu_sarjana2->fromArray($data_waktu_tunggu_sarjana, NULL, 'A1');
+
+$writer_waktu_tunggu_sarjana = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_waktu_tunggu_sarjana, 'Xlsx');
+$writer_waktu_tunggu_sarjana->save('./formatted/sapto_waktu_tunggu_lulusan_sarjana (F).xlsx');
+
+$spreadsheet_waktu_tunggu_sarjana->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_sarjana);
+
+// Load Format Baru
+$spreadsheet_waktu_tunggu_sarjana2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_waktu_tunggu_lulusan_sarjana (F).xlsx');
+$worksheet_waktu_tunggu_sarjana3 = $spreadsheet_waktu_tunggu_sarjana2->getSheetByName('Sheet 2');
+
+// May be change
+$waktu_tunggu_sarjana_ts2 = $worksheet_waktu_tunggu_sarjana3->rangeToArray('B1:F1', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_sarjana_ts3 = $worksheet_waktu_tunggu_sarjana3->rangeToArray('B2:F2', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_sarjana_ts4 = $worksheet_waktu_tunggu_sarjana3->rangeToArray('B3:F3', NULL, TRUE, TRUE, TRUE);
+
+$spreadsheet_waktu_tunggu_sarjana2->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_sarjana2);
+
+
+// Sarjana Terapan
+/* $spreadsheet_waktu_tunggu_terapan = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_waktu_tunggu_lulusan_terapan.xlsx');
+
+$worksheet_waktu_tunggu_terapan = $spreadsheet_waktu_tunggu_terapan->getActiveSheet();
+
+$highestRow_waktu_tunggu_terapan = $worksheet_waktu_tunggu_terapan->getHighestRow();
+
+$worksheet_waktu_tunggu_terapan->setAutoFilter('B1:I'.$highestRow_waktu_tunggu_terapan);
+$autoFilter_waktu_tunggu_terapan = $worksheet_waktu_tunggu_terapan->getAutoFilter();
+$columnFilter_waktu_tunggu_terapan = $autoFilter_waktu_tunggu_terapan->getColumn('H');
+$columnFilter_waktu_tunggu_terapan2 = $autoFilter_waktu_tunggu_terapan->getColumn('B');
+$columnFilter_waktu_tunggu_terapan->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_terapan->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        $nama_prodi2
+    );
+$columnFilter_waktu_tunggu_terapan2->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_waktu_tunggu_terapan2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-4'
+    );
+$columnFilter_waktu_tunggu_terapan2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-3'
+    );
+$columnFilter_waktu_tunggu_terapan2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-2'
+    );
+
+$autoFilter_waktu_tunggu_terapan->showHideRows();
+
+$array_waktu_tunggu_terapan = $worksheet_waktu_tunggu_terapan->toArray();
+$data_waktu_tunggu_terapan = [];
+
+foreach($worksheet_waktu_tunggu_terapan->getRowIterator() as $row_id => $row) {
+    if($worksheet_waktu_tunggu_terapan->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['tahun_lulus'] = $array_waktu_tunggu_terapan[$row_id-1][1];
+            $item['jml_lulusan'] = $array_waktu_tunggu_terapan[$row_id-1][2];
+			$item['jml_terlacak'] = $array_waktu_tunggu_terapan[$row_id-1][3];
+			$item['kurang_3'] = $array_waktu_tunggu_terapan[$row_id-1][4];
+			$item['sampai_6'] = $array_waktu_tunggu_terapan[$row_id-1][5];
+			$item['lebih_6'] = $array_waktu_tunggu_terapan[$row_id-1][6];
+            $data_waktu_tunggu_terapan[] = $item;
+        }
+    }
+}
+
+$worksheet_waktu_tunggu_terapan2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_waktu_tunggu_terapan, 'Sheet 2');
+$spreadsheet_waktu_tunggu_terapan->addSheet($worksheet_waktu_tunggu_terapan2);
+
+$worksheet_waktu_tunggu_terapan2 = $spreadsheet_waktu_tunggu_terapan->getSheetByName('Sheet 2');
+$worksheet_waktu_tunggu_terapan2->fromArray($data_waktu_tunggu_terapan, NULL, 'A1');
+
+$writer_waktu_tunggu_terapan = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_waktu_tunggu_terapan, 'Xlsx');
+$writer_waktu_tunggu_terapan->save('./formatted/sapto_waktu_tunggu_lulusan_terapan (F).xlsx');
+
+$spreadsheet_waktu_tunggu_terapan->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_terapan);
+
+// Load Format Baru
+$spreadsheet_waktu_tunggu_terapan2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_waktu_tunggu_lulusan_terapan (F).xlsx');
+$worksheet_waktu_tunggu_terapan3 = $spreadsheet_waktu_tunggu_terapan2->getSheetByName('Sheet 2');
+
+// May be change
+$waktu_tunggu_terapan_ts2 = $worksheet_waktu_tunggu_terapan3->rangeToArray('B1:F1', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_terapan_ts3 = $worksheet_waktu_tunggu_terapan3->rangeToArray('B2:F2', NULL, TRUE, TRUE, TRUE);
+$waktu_tunggu_terapan_ts4 = $worksheet_waktu_tunggu_terapan3->rangeToArray('B3:F3', NULL, TRUE, TRUE, TRUE);
+
+$spreadsheet_waktu_tunggu_terapan2->disconnectWorksheets();
+unset($spreadsheet_waktu_tunggu_terapan2); */
 
 
 /**
@@ -2037,7 +2294,6 @@ foreach($worksheet_sesuai_kerja2->getRowIterator() as $row_id => $row) {
 
 $spreadsheet_sesuai_kerja2->disconnectWorksheets();
 unset($spreadsheet_sesuai_kerja2);
-
 
 
 /**
@@ -3195,7 +3451,6 @@ for($row = 11; $row <= $highestRow_aps26; $row++) {
 }
 
 
-
 // Kesesuaian Bidang Kerja Lulusan
 $worksheet_aps27 = $spreadsheet_aps->getSheetByName('8d2');
 $worksheet_aps27->fromArray($data_sesuai_kerja, NULL, 'A7');
@@ -3206,7 +3461,7 @@ $jumlahRow_aps27 = $highestRow_aps27 + 1;
 $worksheet_aps27->setCellValue('A'.$jumlahRow_aps27, 'Jumlah');
 $worksheet_aps27->setCellValue('B'.$jumlahRow_aps27, '=SUM(B7:B'.$highestRow_aps27.')');
 $worksheet_aps27->setCellValue('C'.$jumlahRow_aps27, '=SUM(C7:C'.$highestRow_aps27.')');
-$worksheet_aps27->setCellValue('D'.$jumlahRow_aps27, '=SUM(D7:F'.$highestRow_aps27.')');
+$worksheet_aps27->setCellValue('D'.$jumlahRow_aps27, '=SUM(D7:D'.$highestRow_aps27.')');
 $worksheet_aps27->setCellValue('E'.$jumlahRow_aps27, '=SUM(E7:E'.$highestRow_aps27.')');
 $worksheet_aps27->setCellValue('F'.$jumlahRow_aps27, '=SUM(F7:F'.$highestRow_aps27.')');
 
@@ -3231,7 +3486,7 @@ $jumlahRow_aps28 = $highestRow_aps28 + 1;
 $worksheet_aps28->setCellValue('A'.$jumlahRow_aps28, 'Jumlah');
 $worksheet_aps28->setCellValue('B'.$jumlahRow_aps28, '=SUM(B7:B'.$highestRow_aps28.')');
 $worksheet_aps28->setCellValue('C'.$jumlahRow_aps28, '=SUM(C7:C'.$highestRow_aps28.')');
-$worksheet_aps28->setCellValue('D'.$jumlahRow_aps28, '=SUM(D7:F'.$highestRow_aps28.')');
+$worksheet_aps28->setCellValue('D'.$jumlahRow_aps28, '=SUM(D7:D'.$highestRow_aps28.')');
 $worksheet_aps28->setCellValue('E'.$jumlahRow_aps28, '=SUM(E7:E'.$highestRow_aps28.')');
 $worksheet_aps28->setCellValue('F'.$jumlahRow_aps28, '=SUM(F7:F'.$highestRow_aps28.')');
 
@@ -3457,6 +3712,43 @@ $worksheet_aps37->getStyle('H24:H26')->getNumberFormat()->setFormatCode('0.00');
 $worksheet_aps37->getStyle('K32:K36')->getNumberFormat()->setFormatCode('0.00'); 
 
 
+// Waktu Tunggu Lulusan
+$worksheet_aps38 = $spreadsheet_aps->getSheetByName('8d1');
+
+if(substr($nama_prodi2, 0, 3) == "D-3") {
+	$worksheet_aps38->fromArray($waktu_tunggu_diploma_ts4, NULL, 'B7');
+	$worksheet_aps38->fromArray($waktu_tunggu_diploma_ts3, NULL, 'B8');
+	$worksheet_aps38->fromArray($waktu_tunggu_diploma_ts2, NULL, 'B9');
+	
+	$worksheet_aps38->setCellValue('B10', '=SUM(B7:B9)');
+	$worksheet_aps38->setCellValue('C10', '=SUM(C7:C9)');
+	$worksheet_aps38->setCellValue('D10', '=SUM(D7:D9)');
+	$worksheet_aps38->setCellValue('E10', '=SUM(E7:E9)');
+	$worksheet_aps38->setCellValue('F10', '=SUM(F7:F9)');
+	$worksheet_aps38->setCellValue('G10', '=SUM(G7:G9)');
+	
+} elseif(substr($nama_prodi2, 0, 3) == "S-1") {
+	$worksheet_aps38->fromArray($waktu_tunggu_sarjana_ts4, NULL, 'B16');
+	$worksheet_aps38->fromArray($waktu_tunggu_sarjana_ts3, NULL, 'B17');
+	$worksheet_aps38->fromArray($waktu_tunggu_sarjana_ts2, NULL, 'B18');
+	
+	$worksheet_aps38->setCellValue('B19', '=SUM(B16:B18)');
+	$worksheet_aps38->setCellValue('C19', '=SUM(C16:C18)');
+	$worksheet_aps38->setCellValue('D19', '=SUM(D16:D18)');
+	$worksheet_aps38->setCellValue('E19', '=SUM(E16:E18)');
+	$worksheet_aps38->setCellValue('F19', '=SUM(F16:F18)');
+	
+} elseif(substr($nama_prodi2, 0, 3) == "D-4") {
+	$worksheet_aps38->fromArray($waktu_tunggu_terapan_ts4, NULL, 'B25');
+	$worksheet_aps38->fromArray($waktu_tunggu_terapan_ts3, NULL, 'B26');
+	$worksheet_aps38->fromArray($waktu_tunggu_terapan_ts2, NULL, 'B27');
+	
+	$worksheet_aps38->setCellValue('B28', '=SUM(B25:B27)');
+	$worksheet_aps38->setCellValue('C28', '=SUM(C25:C27)');
+	$worksheet_aps38->setCellValue('D28', '=SUM(D25:D27)');
+	$worksheet_aps38->setCellValue('E28', '=SUM(E25:E27)');
+	$worksheet_aps38->setCellValue('F28', '=SUM(F25:F27)');
+}
 
 
 $writer_aps = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_aps, 'Xlsx');
