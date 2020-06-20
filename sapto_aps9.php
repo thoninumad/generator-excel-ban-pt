@@ -4,6 +4,11 @@ require 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+/* if ($argc < 2 )
+{
+    exit( "Usage: sapto_aps9.php <nama prodi sesuai di database>\n" );
+} */
+
 $styleBorder = [
     'borders' => [
         'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN, 'color' => ['argb' => '000000']]
@@ -37,6 +42,7 @@ $styleBold = [
 	]
 ];
 
+// $nama_prodi = $argv[1];
 $nama_prodi = 'S-1 T.MESIN';
 $nama_prodi2 = 'S-1 TEKNIK MESIN  - T.Mesin - Fakultas Teknologi Industri dan Rekayasa Sistem';
 
@@ -390,6 +396,175 @@ foreach($worksheet_dosen_tetap2->getRowIterator() as $row_id => $row) {
 
 $spreadsheet_dosen_tetap2->disconnectWorksheets();
 unset($spreadsheet_dosen_tetap2);
+
+
+/**
+ * Tabel 3.a.2 Dosen Pembimbing Utama TA
+ */
+
+$spreadsheet_dosen_pembimbing = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_dosen_pembimbing_nilai_rata.xlsx');
+
+$worksheet_dosen_pembimbing = $spreadsheet_dosen_pembimbing->getActiveSheet();
+
+$worksheet_dosen_pembimbing->insertNewColumnBefore('F', 8);
+
+$worksheet_dosen_pembimbing->getCell('F1')->setValue('TS-2 Prodi');
+$worksheet_dosen_pembimbing->getCell('G1')->setValue('TS-1 Prodi');
+$worksheet_dosen_pembimbing->getCell('H1')->setValue('TS Prodi');
+$worksheet_dosen_pembimbing->getCell('I1')->setValue('Rata Prodi');
+$worksheet_dosen_pembimbing->getCell('J1')->setValue('TS-2 Prodi Lain');
+$worksheet_dosen_pembimbing->getCell('K1')->setValue('TS-1 Prodi Lain');
+$worksheet_dosen_pembimbing->getCell('L1')->setValue('TS Prodi Lain');
+$worksheet_dosen_pembimbing->getCell('M1')->setValue('Rata Prodi Lain');
+
+$highestRow_dosen_pembimbing = $worksheet_dosen_pembimbing->getHighestRow();
+
+for($row = 2;$row <= $highestRow_dosen_pembimbing; $row++) {
+	if($nama_prodi == $worksheet_dosen_pembimbing->getCell('E'.$row)->getValue()) {
+		$worksheet_dosen_pembimbing->setCellValue('F'.$row, '=IF(D'.$row.'=2018,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('F'.$row)->getStyle()->setQuotePrefix(true);
+		
+		$worksheet_dosen_pembimbing->setCellValue('G'.$row, '=IF(D'.$row.'=2019,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('G'.$row)->getStyle()->setQuotePrefix(true);
+		
+		$worksheet_dosen_pembimbing->setCellValue('H'.$row, '=IF(D'.$row.'=2020,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('H'.$row)->getStyle()->setQuotePrefix(true);
+		
+		$worksheet_dosen_pembimbing->setCellValue('I'.$row, $worksheet_dosen_pembimbing->getCell('Q'.$row)->getValue());
+	} else {
+		$worksheet_dosen_pembimbing->setCellValue('J'.$row, '=IF(D'.$row.'=2018,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('J'.$row)->getStyle()->setQuotePrefix(true);
+		
+		$worksheet_dosen_pembimbing->setCellValue('K'.$row, '=IF(D'.$row.'=2019,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('K'.$row)->getStyle()->setQuotePrefix(true);
+		
+		$worksheet_dosen_pembimbing->setCellValue('L'.$row, '=IF(D'.$row.'=2020,P'.$row.',0)');
+		$worksheet_dosen_pembimbing->getCell('L'.$row)->getStyle()->setQuotePrefix(true);
+	
+		$worksheet_dosen_pembimbing->setCellValue('M'.$row, $worksheet_dosen_pembimbing->getCell('Q'.$row)->getValue());
+	}
+}
+
+$worksheet_dosen_pembimbing->setAutoFilter('A1:R'.$highestRow_dosen_pembimbing);
+$autoFilter_dosen_pembimbing = $worksheet_dosen_pembimbing->getAutoFilter();
+$columnFilter_dosen_pembimbing = $autoFilter_dosen_pembimbing->getColumn('D');
+$columnFilter_dosen_pembimbing->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_dosen_pembimbing->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        2018
+    );
+$columnFilter_dosen_pembimbing->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        2019
+    );
+$columnFilter_dosen_pembimbing->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        2020
+    );
+
+$autoFilter_dosen_pembimbing->showHideRows();
+
+$writer_dosen_pembimbing = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_dosen_pembimbing, 'Xls');
+$writer_dosen_pembimbing->save('./formatted/sapto_dosen_pembimbing_nilai_rata (F).xls');
+
+$spreadsheet_dosen_pembimbing->disconnectWorksheets();
+unset($spreadsheet_dosen_pembimbing);
+
+// Load Format Baru
+$spreadsheet_dosen_pembimbing2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_dosen_pembimbing_nilai_rata (F).xls');
+$worksheet_dosen_pembimbing2 = $spreadsheet_dosen_pembimbing2->getActiveSheet();
+
+// May be change
+$array_dosen_pembimbing = $worksheet_dosen_pembimbing2->toArray();
+$data_dosen_pembimbing = [];
+
+foreach($worksheet_dosen_pembimbing2->getRowIterator() as $row_id => $row) {
+    if($worksheet_dosen_pembimbing2->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['nama_dosen'] = $array_dosen_pembimbing[$row_id-1][0];
+            $item['ts2_prodi'] = $array_dosen_pembimbing[$row_id-1][5];
+			$item['ts1_prodi'] = $array_dosen_pembimbing[$row_id-1][6];
+			$item['ts_prodi'] = $array_dosen_pembimbing[$row_id-1][7];
+			$item['rata_prodi'] = $array_dosen_pembimbing[$row_id-1][8];
+			$item['ts2_prodi_lain'] = $array_dosen_pembimbing[$row_id-1][9];
+			$item['ts1_prodi_lain'] = $array_dosen_pembimbing[$row_id-1][10];
+			$item['ts_prodi_lain'] = $array_dosen_pembimbing[$row_id-1][11];
+			$item['rata_prodi_lain'] = $array_dosen_pembimbing[$row_id-1][12];
+			$item['rata_total'] = $array_dosen_pembimbing[$row_id-1][17];
+            $data_dosen_pembimbing[] = $item;
+        }
+    }
+}
+
+
+$worksheet_dosen_pembimbing3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_dosen_pembimbing2, 'Sheet 2');
+$spreadsheet_dosen_pembimbing2->addSheet($worksheet_dosen_pembimbing3);
+
+$worksheet_dosen_pembimbing3 = $spreadsheet_dosen_pembimbing2->getSheetByName('Sheet 2');
+$worksheet_dosen_pembimbing3->fromArray($data_dosen_pembimbing, NULL, 'A1');
+
+
+$highestRow_dosen_pembimbing3 = $worksheet_dosen_pembimbing3->getHighestRow();
+
+$worksheet_dosen_pembimbing3->setCellValue('L1', '=SUMPRODUCT((A1:A'.$highestRow_dosen_pembimbing3.'<>"")/COUNTIF(A1:A'.$highestRow_dosen_pembimbing3.',A1:A'.$highestRow_dosen_pembimbing3.'&""))');
+
+
+$total_dosen_pembimbing = $worksheet_dosen_pembimbing3->getCell('L1')->getValue();
+$row_jumlah_pembimbing = -1;
+
+for($group = 1;$group <= 88; $group++) {
+	
+	$row_jumlah_pembimbing += 2;
+	$baris_awal_pembimbing = $row_jumlah_pembimbing;
+	
+	$ts2_prodi = $worksheet_dosen_pembimbing3->getCell('B'.($row_jumlah_pembimbing))->getValue(); 
+	$ts1_prodi = $worksheet_dosen_pembimbing3->getCell('C'.($row_jumlah_pembimbing))->getValue();
+	$ts_prodi = $worksheet_dosen_pembimbing3->getCell('D'.($row_jumlah_pembimbing))->getValue();
+	$ts2_prodi_lain = $worksheet_dosen_pembimbing3->getCell('F'.($row_jumlah_pembimbing))->getValue();
+	$ts1_prodi_lain = $worksheet_dosen_pembimbing3->getCell('G'.($row_jumlah_pembimbing))->getValue();
+	$ts_prodi_lain = $worksheet_dosen_pembimbing3->getCell('H'.($row_jumlah_pembimbing))->getValue();
+	
+	for($row = $row_jumlah_pembimbing;$row <= ($highestRow_dosen_pembimbing3+1); $row++) {
+		if($worksheet_dosen_pembimbing3->getCell('A'.$row)->getValue() == $worksheet_dosen_pembimbing3->getCell('A'.($row+1))->getValue()) {
+			$ts2_prodi += $worksheet_dosen_pembimbing3->getCell('B'.($row+1))->getValue();
+			$ts1_prodi += $worksheet_dosen_pembimbing3->getCell('C'.($row+1))->getValue();
+			$ts_prodi += $worksheet_dosen_pembimbing3->getCell('D'.($row+1))->getValue();
+			$ts2_prodi_lain += $worksheet_dosen_pembimbing3->getCell('F'.($row+1))->getValue();
+			$ts1_prodi_lain += $worksheet_dosen_pembimbing3->getCell('G'.($row+1))->getValue();
+			$ts_prodi_lain += $worksheet_dosen_pembimbing3->getCell('H'.($row+1))->getValue();
+			
+			$row_jumlah_pembimbing++;
+		} else {
+			break;
+		}
+	}
+	
+	$worksheet_dosen_pembimbing3->insertNewRowBefore(($row_jumlah_pembimbing+1), 1);
+	$worksheet_dosen_pembimbing3->setCellValue('A'.($row_jumlah_pembimbing+1), $worksheet_dosen_pembimbing3->getCell('A'.$row_jumlah_pembimbing)->getValue());
+	$worksheet_dosen_pembimbing3->setCellValue('B'.($row_jumlah_pembimbing+1), $ts2_prodi);
+	$worksheet_dosen_pembimbing3->setCellValue('C'.($row_jumlah_pembimbing+1), $ts1_prodi);
+	$worksheet_dosen_pembimbing3->setCellValue('D'.($row_jumlah_pembimbing+1), $ts_prodi);
+	$worksheet_dosen_pembimbing3->setCellValue('E'.($row_jumlah_pembimbing+1), '=IF(ISERROR(AVERAGE(B'.($row_jumlah_pembimbing+1).':D'.($row_jumlah_pembimbing+1).')),"",AVERAGE(B'.($row_jumlah_pembimbing+1).':D'.($row_jumlah_pembimbing+1).'))');
+	$worksheet_dosen_pembimbing3->setCellValue('F'.($row_jumlah_pembimbing+1), $ts2_prodi_lain);	
+	$worksheet_dosen_pembimbing3->setCellValue('G'.($row_jumlah_pembimbing+1), $ts1_prodi_lain);
+	$worksheet_dosen_pembimbing3->setCellValue('H'.($row_jumlah_pembimbing+1), $ts_prodi_lain);
+	$worksheet_dosen_pembimbing3->setCellValue('I'.($row_jumlah_pembimbing+1), '=IF(ISERROR(AVERAGE(F'.($row_jumlah_pembimbing+1).':H'.($row_jumlah_pembimbing+1).')),"",AVERAGE(F'.($row_jumlah_pembimbing+1).':H'.($row_jumlah_pembimbing+1).'))');
+	$worksheet_dosen_pembimbing3->setCellValue('J'.($row_jumlah_pembimbing+1), $worksheet_dosen_pembimbing3->getCell('J'.$row_jumlah_pembimbing)->getValue());
+	
+	${"dosen_pembimbing".$group} = $worksheet_dosen_pembimbing3->rangeToArray('A'.($row_jumlah_pembimbing+1).':J'.($row_jumlah_pembimbing+1), NULL, TRUE, TRUE, TRUE);
+}
+
+$writer_dosen_pembimbing2 = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_dosen_pembimbing2, 'Xls');
+$writer_dosen_pembimbing2->save('./formatted/sapto_dosen_pembimbing_nilai_rata (F).xls');
+
+$spreadsheet_dosen_pembimbing2->disconnectWorksheets();
+unset($spreadsheet_dosen_pembimbing2); 
 
 
 /**
@@ -3748,6 +3923,34 @@ if(substr($nama_prodi2, 0, 3) == "D-3") {
 	$worksheet_aps38->setCellValue('D28', '=SUM(D25:D27)');
 	$worksheet_aps38->setCellValue('E28', '=SUM(E25:E27)');
 	$worksheet_aps38->setCellValue('F28', '=SUM(F25:F27)');
+}
+
+
+// Dosen Pembimbing Utama TA
+$worksheet_aps39 = $spreadsheet_aps->getSheetByName('3a2');
+
+for($group = 1; $group <= 88; $group++) {
+	$worksheet_aps39->fromArray(${"dosen_pembimbing".$group}, NULL, 'B'.($group+6));
+}
+	
+$highestRow_aps39 = $worksheet_aps39->getHighestRow();
+
+$worksheet_aps39->getStyle('A7:K'.$highestRow_aps39)->applyFromArray($styleBorder);
+$worksheet_aps39->getStyle('B7:K'.$highestRow_aps39)->applyFromArray($styleYellow);
+$worksheet_aps39->getStyle('A7:A'.$highestRow_aps39)->applyFromArray($styleCenter);
+$worksheet_aps39->getStyle('C7:K'.$highestRow_aps39)->applyFromArray($styleCenter);
+$worksheet_aps39->getStyle('A3:K'.$highestRow_aps39)->getAlignment()->setWrapText(true);
+
+$worksheet_aps39->getStyle('F7:F'.$highestRow_aps39)->getNumberFormat()->setFormatCode('0.00'); 
+$worksheet_aps39->getStyle('J7:J'.$highestRow_aps39)->getNumberFormat()->setFormatCode('0.00');
+$worksheet_aps39->getStyle('K7:K'.$highestRow_aps39)->getNumberFormat()->setFormatCode('0.00');  
+
+foreach($worksheet_aps39->getRowDimensions() as $rd39) { 
+    $rd39->setRowHeight(-1); 
+}
+
+for($row = 7; $row <= $highestRow_aps39; $row++) {
+	$worksheet_aps39->setCellValue('A'.$row, $row-6);
 }
 
 
