@@ -278,6 +278,7 @@ $highestRow_seleksi_mhs = $worksheet_seleksi_mhs->getHighestRow();
 $worksheet_seleksi_mhs->setAutoFilter('B1:L'.$highestRow_seleksi_mhs);
 $autoFilter_seleksi_mhs = $worksheet_seleksi_mhs->getAutoFilter();
 $columnFilter_seleksi_mhs = $autoFilter_seleksi_mhs->getColumn('B');
+$columnFilter_seleksi_mhs2 = $autoFilter_seleksi_mhs->getColumn('E');
 $columnFilter_seleksi_mhs->setFilterType(
     \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
 );
@@ -286,25 +287,43 @@ $columnFilter_seleksi_mhs->createRule()
         \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
         $nama_prodi
     );
+$columnFilter_seleksi_mhs2->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_seleksi_mhs2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-4'
+    );
+$columnFilter_seleksi_mhs2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-3'
+    );
+$columnFilter_seleksi_mhs2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-2'
+    );
+$columnFilter_seleksi_mhs2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-1'
+    );
+$columnFilter_seleksi_mhs2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS'
+    );
 
 $autoFilter_seleksi_mhs->showHideRows();
 
-$writer_seleksi_mhs = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_seleksi_mhs, 'Xlsx');
-$writer_seleksi_mhs->save('./formatted/sapto_seleksi_mhs_baru (F).xlsx');
-
-$spreadsheet_seleksi_mhs->disconnectWorksheets();
-unset($spreadsheet_seleksi_mhs);
-
-// Load Format Baru
-$spreadsheet_seleksi_mhs2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_seleksi_mhs_baru (F).xlsx');
-$worksheet_seleksi_mhs2 = $spreadsheet_seleksi_mhs2->getActiveSheet();
-
 // May be change
-$array_seleksi_mhs = $worksheet_seleksi_mhs2->toArray();
+$array_seleksi_mhs = $worksheet_seleksi_mhs->toArray();
 $data_seleksi_mhs = [];
 
-foreach($worksheet_seleksi_mhs2->getRowIterator() as $row_id => $row) {
-    if($worksheet_seleksi_mhs2->getRowDimension($row_id)->getVisible()) {
+foreach($worksheet_seleksi_mhs->getRowIterator() as $row_id => $row) {
+    if($worksheet_seleksi_mhs->getRowDimension($row_id)->getVisible()) {
         if($row_id > 1) { 
             $item = array();
             $item['tahun_akademik'] = $array_seleksi_mhs[$row_id-1][4];
@@ -320,8 +339,214 @@ foreach($worksheet_seleksi_mhs2->getRowIterator() as $row_id => $row) {
     }
 }
 
+$worksheet_seleksi_mhs2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_seleksi_mhs, 'Sheet 2');
+$spreadsheet_seleksi_mhs->addSheet($worksheet_seleksi_mhs2);
+
+$worksheet_seleksi_mhs2 = $spreadsheet_seleksi_mhs->getSheetByName('Sheet 2');
+$worksheet_seleksi_mhs2->fromArray($data_seleksi_mhs, NULL, 'A1');
+
+$writer_seleksi_mhs = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_seleksi_mhs, 'Xlsx');
+$writer_seleksi_mhs->save('./formatted/sapto_seleksi_mhs_baru (F).xlsx');
+
+$spreadsheet_seleksi_mhs->disconnectWorksheets();
+unset($spreadsheet_seleksi_mhs);
+
+// Load Format Baru
+$spreadsheet_seleksi_mhs2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_seleksi_mhs_baru (F).xlsx');
+$worksheet_seleksi_mhs3 = $spreadsheet_seleksi_mhs2->getSheetByName('Sheet 2');
+
+// May be change
+$ts4_seleksi_mhs = $worksheet_seleksi_mhs3->rangeToArray('B5:H5', NULL, TRUE, TRUE, TRUE);
+$ts3_seleksi_mhs = $worksheet_seleksi_mhs3->rangeToArray('B4:H4', NULL, TRUE, TRUE, TRUE);
+$ts2_seleksi_mhs = $worksheet_seleksi_mhs3->rangeToArray('B3:H3', NULL, TRUE, TRUE, TRUE);
+$ts1_seleksi_mhs = $worksheet_seleksi_mhs3->rangeToArray('B2:H2', NULL, TRUE, TRUE, TRUE);
+$ts_seleksi_mhs = $worksheet_seleksi_mhs3->rangeToArray('B1:H1', NULL, TRUE, TRUE, TRUE);
+
 $spreadsheet_seleksi_mhs2->disconnectWorksheets();
 unset($spreadsheet_seleksi_mhs2);
+
+
+/**
+ * Tabel 2.b Mahasiswa Asing
+ */
+
+$spreadsheet_mhs_asing = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_mhs_asing.xlsx');
+
+$worksheet_mhs_asing = $spreadsheet_mhs_asing->getActiveSheet();
+
+$worksheet_mhs_asing->insertNewColumnBefore('G', 3);
+$worksheet_mhs_asing->insertNewColumnBefore('K', 3);
+
+$worksheet_mhs_asing->getCell('G1')->setValue('TS-2 Aktif');
+$worksheet_mhs_asing->getCell('H1')->setValue('TS-1 Aktif');
+$worksheet_mhs_asing->getCell('I1')->setValue('TS Aktif');
+$worksheet_mhs_asing->getCell('K1')->setValue('TS-2 Full Time');
+$worksheet_mhs_asing->getCell('L1')->setValue('TS-1 Full Time');
+$worksheet_mhs_asing->getCell('M1')->setValue('TS Full Time');
+$worksheet_mhs_asing->getCell('O1')->setValue('TS-2 Part Time');
+$worksheet_mhs_asing->getCell('P1')->setValue('TS-1 Part Time');
+$worksheet_mhs_asing->getCell('Q1')->setValue('TS Part Time');
+
+$highestRow_mhs_asing = $worksheet_mhs_asing->getHighestRow();
+
+for($row = 2;$row <= $highestRow_mhs_asing; $row++) {
+	$worksheet_mhs_asing->setCellValue('G'.$row, '=IF(D'.$row.'=2018,F'.$row.',0)');
+	$worksheet_mhs_asing->getCell('G'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('H'.$row, '=IF(D'.$row.'=2019,F'.$row.',0)');
+	$worksheet_mhs_asing->getCell('H'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('I'.$row, '=IF(D'.$row.'=2020,F'.$row.',0)');
+	$worksheet_mhs_asing->getCell('I'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('K'.$row, '=IF(D'.$row.'=2018,J'.$row.',0)');
+	$worksheet_mhs_asing->getCell('K'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('L'.$row, '=IF(D'.$row.'=2019,J'.$row.',0)');
+	$worksheet_mhs_asing->getCell('L'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('M'.$row, '=IF(D'.$row.'=2020,J'.$row.',0)');
+	$worksheet_mhs_asing->getCell('M'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('O'.$row, '=IF(D'.$row.'=2018,N'.$row.',0)');
+	$worksheet_mhs_asing->getCell('O'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('P'.$row, '=IF(D'.$row.'=2019,N'.$row.',0)');
+	$worksheet_mhs_asing->getCell('P'.$row)->getStyle()->setQuotePrefix(true);
+	
+	$worksheet_mhs_asing->setCellValue('Q'.$row, '=IF(D'.$row.'=2020,N'.$row.',0)');
+	$worksheet_mhs_asing->getCell('Q'.$row)->getStyle()->setQuotePrefix(true);
+}
+
+$worksheet_mhs_asing->setAutoFilter('A1:Q'.$highestRow_mhs_asing);
+$autoFilter_mhs_asing = $worksheet_mhs_asing->getAutoFilter();
+$columnFilter_mhs_asing = $autoFilter_mhs_asing->getColumn('B');
+$columnFilter_mhs_asing2 = $autoFilter_mhs_asing->getColumn('E');
+$columnFilter_mhs_asing->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_mhs_asing->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+       $nama_prodi
+    );
+$columnFilter_mhs_asing2->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_mhs_asing2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-2'
+    );
+$columnFilter_mhs_asing2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS-1'
+    );
+$columnFilter_mhs_asing2->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        'TS'
+    );
+
+$autoFilter_mhs_asing->showHideRows();
+
+$writer_mhs_asing = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_mhs_asing, 'Xls');
+$writer_mhs_asing->save('./formatted/sapto_mhs_asing (F).xls');
+
+$spreadsheet_mhs_asing->disconnectWorksheets();
+unset($spreadsheet_mhs_asing);
+
+// Load Format Baru
+$spreadsheet_mhs_asing2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_mhs_asing (F).xls');
+$worksheet_mhs_asing2 = $spreadsheet_mhs_asing2->getActiveSheet();
+
+// May be change
+$array_mhs_asing = $worksheet_mhs_asing2->toArray();
+$data_mhs_asing = [];
+
+foreach($worksheet_mhs_asing2->getRowIterator() as $row_id => $row) {
+    if($worksheet_mhs_asing2->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['nama_prodi'] = $array_mhs_asing[$row_id-1][1];
+            $item['ts2_aktif'] = $array_mhs_asing[$row_id-1][6];
+			$item['ts1_aktif'] = $array_mhs_asing[$row_id-1][7];
+			$item['ts_aktif'] = $array_mhs_asing[$row_id-1][8];
+			$item['ts2_full_time'] = $array_mhs_asing[$row_id-1][10];
+			$item['ts1_full_time'] = $array_mhs_asing[$row_id-1][11];
+			$item['ts_full_time'] = $array_mhs_asing[$row_id-1][12];
+			$item['ts2_part_time'] = $array_mhs_asing[$row_id-1][14];
+			$item['ts1_part_time'] = $array_mhs_asing[$row_id-1][15];
+			$item['ts_part_time'] = $array_mhs_asing[$row_id-1][16];
+            $data_mhs_asing[] = $item;
+        }
+    }
+}
+
+$worksheet_mhs_asing3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_mhs_asing2, 'Sheet 2');
+$spreadsheet_mhs_asing2->addSheet($worksheet_mhs_asing3);
+
+$worksheet_mhs_asing3 = $spreadsheet_mhs_asing2->getSheetByName('Sheet 2');
+$worksheet_mhs_asing3->fromArray($data_mhs_asing, NULL, 'A1');
+
+$highestRow_mhs_asing3 = $worksheet_mhs_asing3->getHighestRow();
+
+$row_jumlah_mhs_asing = -1;
+
+for($group = 1;$group <= 3; $group++) {
+	
+	$row_jumlah_mhs_asing += 2;
+	$baris_awal_mhs_asing = $row_jumlah_mhs_asing;
+	
+	$ts2_aktif = $worksheet_mhs_asing3->getCell('B'.($row_jumlah_mhs_asing))->getValue(); 
+	$ts1_aktif = $worksheet_mhs_asing3->getCell('C'.($row_jumlah_mhs_asing))->getValue();
+	$ts_aktif = $worksheet_mhs_asing3->getCell('D'.($row_jumlah_mhs_asing))->getValue();
+	$ts2_full_time = $worksheet_mhs_asing3->getCell('E'.($row_jumlah_mhs_asing))->getValue();
+	$ts1_full_time = $worksheet_mhs_asing3->getCell('F'.($row_jumlah_mhs_asing))->getValue();
+	$ts_full_time = $worksheet_mhs_asing3->getCell('G'.($row_jumlah_mhs_asing))->getValue();
+	$ts2_part_time = $worksheet_mhs_asing3->getCell('H'.($row_jumlah_mhs_asing))->getValue();
+	$ts1_part_time = $worksheet_mhs_asing3->getCell('I'.($row_jumlah_mhs_asing))->getValue();
+	$ts_part_time = $worksheet_mhs_asing3->getCell('J'.($row_jumlah_mhs_asing))->getValue();
+	
+	for($row = $row_jumlah_mhs_asing;$row <= ($highestRow_mhs_asing3+1); $row++) {
+		if($worksheet_mhs_asing3->getCell('A'.$row)->getValue() == $worksheet_mhs_asing3->getCell('A'.($row+1))->getValue()) {
+			$ts2_aktif += $worksheet_mhs_asing3->getCell('B'.($row+1))->getValue();
+			$ts1_aktif += $worksheet_mhs_asing3->getCell('C'.($row+1))->getValue();
+			$ts_aktif += $worksheet_mhs_asing3->getCell('D'.($row+1))->getValue();
+			$ts2_full_time += $worksheet_mhs_asing3->getCell('E'.($row+1))->getValue();
+			$ts1_full_time += $worksheet_mhs_asing3->getCell('F'.($row+1))->getValue();
+			$ts_full_time += $worksheet_mhs_asing3->getCell('G'.($row+1))->getValue();
+			$ts2_part_time += $worksheet_mhs_asing3->getCell('H'.($row+1))->getValue();
+			$ts1_part_time += $worksheet_mhs_asing3->getCell('I'.($row+1))->getValue();
+			$ts_part_time += $worksheet_mhs_asing3->getCell('J'.($row+1))->getValue();
+			
+			$row_jumlah_mhs_asing++;
+		} else {
+			break;
+		}
+	}
+	
+	$worksheet_mhs_asing3->insertNewRowBefore(($row_jumlah_mhs_asing+1), 1);
+	$worksheet_mhs_asing3->setCellValue('A'.($row_jumlah_mhs_asing+1), $worksheet_mhs_asing3->getCell('A'.$row_jumlah_mhs_asing)->getValue());
+	$worksheet_mhs_asing3->setCellValue('B'.($row_jumlah_mhs_asing+1), $ts2_aktif);
+	$worksheet_mhs_asing3->setCellValue('C'.($row_jumlah_mhs_asing+1), $ts1_aktif);
+	$worksheet_mhs_asing3->setCellValue('D'.($row_jumlah_mhs_asing+1), $ts_aktif);
+	$worksheet_mhs_asing3->setCellValue('E'.($row_jumlah_mhs_asing+1), $ts2_full_time);	
+	$worksheet_mhs_asing3->setCellValue('F'.($row_jumlah_mhs_asing+1), $ts1_full_time);
+	$worksheet_mhs_asing3->setCellValue('G'.($row_jumlah_mhs_asing+1), $ts_full_time);
+	$worksheet_mhs_asing3->setCellValue('H'.($row_jumlah_mhs_asing+1), $ts2_part_time);	
+	$worksheet_mhs_asing3->setCellValue('I'.($row_jumlah_mhs_asing+1), $ts1_part_time);
+	$worksheet_mhs_asing3->setCellValue('J'.($row_jumlah_mhs_asing+1), $ts_part_time);
+	
+	${"mhs_asing".$group} = $worksheet_mhs_asing3->rangeToArray('A'.($row_jumlah_mhs_asing+1).':J'.($row_jumlah_mhs_asing+1), NULL, TRUE, TRUE, TRUE);
+}
+
+$writer_mhs_asing2 = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_mhs_asing2, 'Xls');
+$writer_mhs_asing2->save('./formatted/sapto_mhs_asing (F).xls');
+
+$spreadsheet_mhs_asing2->disconnectWorksheets();
+unset($spreadsheet_mhs_asing2);
 
 
 /**
@@ -447,24 +672,24 @@ for($row = 2;$row <= $highestRow_dosen_pembimbing; $row++) {
 
 $worksheet_dosen_pembimbing->setAutoFilter('A1:R'.$highestRow_dosen_pembimbing);
 $autoFilter_dosen_pembimbing = $worksheet_dosen_pembimbing->getAutoFilter();
-$columnFilter_dosen_pembimbing = $autoFilter_dosen_pembimbing->getColumn('D');
+$columnFilter_dosen_pembimbing = $autoFilter_dosen_pembimbing->getColumn('C');
 $columnFilter_dosen_pembimbing->setFilterType(
     \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
 );
 $columnFilter_dosen_pembimbing->createRule()
     ->setRule(
         \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
-        2018
+        'TS-2'
     );
 $columnFilter_dosen_pembimbing->createRule()
     ->setRule(
         \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
-        2019
+        'TS-1'
     );
 $columnFilter_dosen_pembimbing->createRule()
     ->setRule(
         \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
-        2020
+        'TS'
     );
 
 $autoFilter_dosen_pembimbing->showHideRows();
@@ -502,18 +727,15 @@ foreach($worksheet_dosen_pembimbing2->getRowIterator() as $row_id => $row) {
     }
 }
 
-
 $worksheet_dosen_pembimbing3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet_dosen_pembimbing2, 'Sheet 2');
 $spreadsheet_dosen_pembimbing2->addSheet($worksheet_dosen_pembimbing3);
 
 $worksheet_dosen_pembimbing3 = $spreadsheet_dosen_pembimbing2->getSheetByName('Sheet 2');
 $worksheet_dosen_pembimbing3->fromArray($data_dosen_pembimbing, NULL, 'A1');
 
-
 $highestRow_dosen_pembimbing3 = $worksheet_dosen_pembimbing3->getHighestRow();
 
 $worksheet_dosen_pembimbing3->setCellValue('L1', '=SUMPRODUCT((A1:A'.$highestRow_dosen_pembimbing3.'<>"")/COUNTIF(A1:A'.$highestRow_dosen_pembimbing3.',A1:A'.$highestRow_dosen_pembimbing3.'&""))');
-
 
 $total_dosen_pembimbing = $worksheet_dosen_pembimbing3->getCell('L1')->getValue();
 $row_jumlah_pembimbing = -1;
@@ -709,6 +931,74 @@ foreach($worksheet_dosen_tidaktetap2->getRowIterator() as $row_id => $row) {
 
 $spreadsheet_dosen_tidaktetap2->disconnectWorksheets();
 unset($spreadsheet_dosen_tidaktetap2);
+
+
+/**
+ * Tabel 3.a.5 Dosen Industri/Praktisi
+ */
+
+$spreadsheet_dosen_industri = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_dosen_industri.xlsx');
+
+$worksheet_dosen_industri = $spreadsheet_dosen_industri->getActiveSheet();
+
+$worksheet_dosen_industri->insertNewColumnBefore('E', 2);
+$worksheet_dosen_industri->insertNewColumnBefore('J', 3);
+
+$worksheet_dosen_industri->getCell('E1')->setValue('Perusahaan/Industri');
+$worksheet_dosen_industri->getCell('F1')->setValue('Pendidikan Tertinggi');
+$worksheet_dosen_industri->getCell('J1')->setValue('Sertifikat Profesi/ Kompetensi/ Industri');
+$worksheet_dosen_industri->getCell('K1')->setValue('Mata Kuliah yang Diampu');
+$worksheet_dosen_industri->getCell('L1')->setValue('Bobot Kredit (sks)');
+
+$highestRow_dosen_industri = $worksheet_dosen_industri->getHighestRow();
+
+$worksheet_dosen_industri->setAutoFilter('A1:O'.$highestRow_dosen_industri);
+$autoFilter_dosen_industri = $worksheet_dosen_industri->getAutoFilter();
+$columnFilter_dosen_industri = $autoFilter_dosen_industri->getColumn('M');
+$columnFilter_dosen_industri->setFilterType(
+    \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column::AUTOFILTER_FILTERTYPE_FILTER
+);
+$columnFilter_dosen_industri->createRule()
+    ->setRule(
+        \PhpOffice\PhpSpreadsheet\Worksheet\AutoFilter\Column\Rule::AUTOFILTER_COLUMN_RULE_EQUAL,
+        1
+    );
+
+$autoFilter_dosen_industri->showHideRows();
+
+$writer_dosen_industri = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_dosen_industri, 'Xlsx');
+$writer_dosen_industri->save('./formatted/sapto_dosen_industri (F).xlsx');
+
+$spreadsheet_dosen_industri->disconnectWorksheets();
+unset($spreadsheet_dosen_industri);
+
+// Load Format Baru
+$spreadsheet_dosen_industri2 = \PhpOffice\PhpSpreadsheet\IOFactory::load('./formatted/sapto_dosen_industri (F).xlsx');
+$worksheet_dosen_industri2 = $spreadsheet_dosen_industri2->getActiveSheet();
+
+// May be change
+$array_dosen_industri = $worksheet_dosen_industri2->toArray();
+$data_dosen_industri = [];
+
+foreach($worksheet_dosen_industri2->getRowIterator() as $row_id => $row) {
+    if($worksheet_dosen_industri2->getRowDimension($row_id)->getVisible()) {
+        if($row_id > 1) { 
+            $item = array();
+            $item['nama_dosen'] = $array_dosen_industri[$row_id-1][2];
+            $item['nidn_nidk'] = $array_dosen_industri[$row_id-1][3];
+			$item['perusahaan'] = $array_dosen_industri[$row_id-1][4];
+			$item['pendidikan_tertinggi'] = $array_dosen_industri[$row_id-1][5];
+			$item['bidang_keahlian'] = $array_dosen_industri[$row_id-1][8];
+			$item['sertifikat_kompetensi'] = $array_dosen_industri[$row_id-1][9];
+			$item['matkul_ps'] = $array_dosen_industri[$row_id-1][10];
+			$item['sks'] = $array_dosen_industri[$row_id-1][11];
+            $data_dosen_industri[] = $item;
+        }
+    }
+}
+
+$spreadsheet_dosen_industri2->disconnectWorksheets();
+unset($spreadsheet_dosen_industri2);
 
 
 /**
@@ -3093,24 +3383,17 @@ for($row = 12; $row <= $highestRow_aps3; $row++) {
 
 // Seleksi Mahasiswa Baru
 $worksheet_aps4 = $spreadsheet_aps->getSheetByName('2a');
-$worksheet_aps4->fromArray($data_seleksi_mhs, NULL, 'A6');
+$worksheet_aps4->fromArray($ts4_seleksi_mhs, NULL, 'B6');
+$worksheet_aps4->fromArray($ts3_seleksi_mhs, NULL, 'B7');
+$worksheet_aps4->fromArray($ts2_seleksi_mhs, NULL, 'B8');
+$worksheet_aps4->fromArray($ts1_seleksi_mhs, NULL, 'B9');
+$worksheet_aps4->fromArray($ts_seleksi_mhs, NULL, 'B10');
 
-$highestRow_aps4 = $worksheet_aps4->getHighestRow();
-$jumlahRow_aps4 = $highestRow_aps4 + 1;
-
-$worksheet_aps4->setCellValue('A'.$jumlahRow_aps4, 'Jumlah');
-$worksheet_aps4->setCellValue('C'.$jumlahRow_aps4, '=SUM(C6:C'.$highestRow_aps4.')');
-$worksheet_aps4->setCellValue('D'.$jumlahRow_aps4, '=SUM(D6:D'.$highestRow_aps4.')');
-$worksheet_aps4->setCellValue('E'.$jumlahRow_aps4, '=SUM(E6:E'.$highestRow_aps4.')');
-$worksheet_aps4->setCellValue('F'.$jumlahRow_aps4, '=SUM(F6:F'.$highestRow_aps4.')');
-$worksheet_aps4->setCellValue('G'.$jumlahRow_aps4, '=SUM(G6:H'.$highestRow_aps4.')');
-
-$worksheet_aps4->mergeCells('A'.$jumlahRow_aps4.':B'.$jumlahRow_aps4);
-$worksheet_aps4->mergeCells('G'.$jumlahRow_aps4.':H'.$jumlahRow_aps4);
-$worksheet_aps4->getStyle('A6:H'.$jumlahRow_aps4)->applyFromArray($styleBorder);
-$worksheet_aps4->getStyle('B6:H'.$highestRow_aps4)->applyFromArray($styleYellow);
-$worksheet_aps4->getStyle('A6:H'.$jumlahRow_aps4)->applyFromArray($styleCenter);
-$worksheet_aps4->getStyle('A'.$jumlahRow_aps4.':H'.$jumlahRow_aps4)->applyFromArray($styleBold);
+$worksheet_aps4->setCellValue('C11', '=SUM(C6:C10)');
+$worksheet_aps4->setCellValue('D11', '=SUM(D6:D10)');
+$worksheet_aps4->setCellValue('E11', '=SUM(E6:E10)');
+$worksheet_aps4->setCellValue('F11', '=SUM(F6:F10)');
+$worksheet_aps4->setCellValue('G11', '=SUM(G6:H10)');
 
 
 // Dosen Tetap Perguruan Tinggi
@@ -3952,6 +4235,125 @@ foreach($worksheet_aps39->getRowDimensions() as $rd39) {
 for($row = 7; $row <= $highestRow_aps39; $row++) {
 	$worksheet_aps39->setCellValue('A'.$row, $row-6);
 }
+
+
+// Mahasiswa Asing
+$worksheet_aps40 = $spreadsheet_aps->getSheetByName('2b');
+
+for($group = 1; $group <= 3; $group++) {
+	$worksheet_aps40->fromArray(${"mhs_asing".$group}, NULL, 'B'.($group+6));
+}
+	
+$highestRow_aps40 = $worksheet_aps40->getHighestRow();
+
+$worksheet_aps40->getStyle('A7:K'.$highestRow_aps40)->applyFromArray($styleBorder);
+$worksheet_aps40->getStyle('B7:K'.$highestRow_aps40)->applyFromArray($styleYellow);
+$worksheet_aps40->getStyle('A7:A'.$highestRow_aps40)->applyFromArray($styleCenter);
+$worksheet_aps40->getStyle('C7:K'.$highestRow_aps40)->applyFromArray($styleCenter);
+$worksheet_aps40->getStyle('A7:A'.$highestRow_aps40)->getAlignment()->setWrapText(true);
+
+foreach($worksheet_aps40->getRowDimensions() as $rd40) { 
+    $rd40->setRowHeight(-1); 
+}
+
+for($row = 7; $row <= $highestRow_aps40; $row++) {
+	$worksheet_aps40->setCellValue('A'.$row, $row-6);
+}
+
+
+// Dosen Industri/Praktisi
+$worksheet_aps41 = $spreadsheet_aps->getSheetByName('3a5');
+$worksheet_aps41->fromArray($data_dosen_industri, NULL, 'B6');
+
+$highestRow_aps41 = $worksheet_aps41->getHighestRow();
+$worksheet_aps41->getStyle('A6:I'.$highestRow_aps41)->applyFromArray($styleBorder);
+$worksheet_aps41->getStyle('B6:I'.$highestRow_aps41)->applyFromArray($styleYellow);
+$worksheet_aps41->getStyle('A6:A'.$highestRow_aps41)->applyFromArray($styleCenter);
+$worksheet_aps41->getStyle('C6:I'.$highestRow_aps41)->applyFromArray($styleCenter);
+$worksheet_aps41->getStyle('B6:I'.$highestRow_aps41)->getAlignment()->setWrapText(true);
+
+foreach($worksheet_aps41->getRowDimensions() as $rd41) { 
+    $rd41->setRowHeight(-1); 
+}
+
+$worksheet_aps41->getStyle('C6:C'.$highestRow_aps41)->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+$worksheet_aps41->getStyle('G6:G'.$highestRow_aps41)->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+
+for($row = 6; $row <= $highestRow_aps41; $row++) {
+	$worksheet_aps41->setCellValue('A'.$row, $row-5);
+}
+
+
+// Pagelaran/Pameran/Presentasi/Publikasi Ilmiah DTPS
+/* $worksheet_aps42 = $spreadsheet_aps->getSheetByName('3b4-2');
+$worksheet_aps42->fromArray($data_pagelaran_dtps, NULL, 'B7');
+
+$highestRow_aps42 = $worksheet_aps42->getHighestRow();
+$jumlahRow_aps42 = $highestRow_aps42 + 1;
+
+$worksheet_aps42->setCellValue('A'.$jumlahRow_aps42, 'Jumlah');
+$worksheet_aps42->setCellValue('C'.$jumlahRow_aps42, '=SUM(C7:C'.$highestRow_aps42.')');
+$worksheet_aps42->setCellValue('D'.$jumlahRow_aps42, '=SUM(D7:D'.$highestRow_aps42.')');
+$worksheet_aps42->setCellValue('E'.$jumlahRow_aps42, '=SUM(E7:E'.$highestRow_aps42.')');
+$worksheet_aps42->setCellValue('F'.$jumlahRow_aps42, '=SUM(C'.$jumlahRow_aps42.':E'.$jumlahRow_aps42.')');
+
+$worksheet_aps42->mergeCells('A'.$jumlahRow_aps42.':B'.$jumlahRow_aps42);
+$worksheet_aps42->getStyle('A7:F'.$jumlahRow_aps42)->applyFromArray($styleBorder);
+$worksheet_aps42->getStyle('C7:E'.$highestRow_aps42)->applyFromArray($styleYellow);
+$worksheet_aps42->getStyle('A7:A'.$jumlahRow_aps42)->applyFromArray($styleCenter);
+$worksheet_aps42->getStyle('C7:F'.$jumlahRow_aps42)->applyFromArray($styleCenter);
+$worksheet_aps42->getStyle('A'.$jumlahRow_aps42.':F'.$jumlahRow_aps42)->applyFromArray($styleBold);
+$worksheet_aps42->getStyle('B7:B'.$highestRow_aps42)->getAlignment()->setWrapText(true);
+
+foreach($worksheet_aps42->getRowDimensions() as $rd42) { 
+    $rd42->setRowHeight(-1); 
+}
+
+for($row = 7; $row <= $highestRow_aps42; $row++) {
+	$worksheet_aps42->setCellValue('A'.$row, $row-6);
+} */
+
+
+// Produk/Jasa DTPS yang Diadopsi oleh Industri/Masyarakat
+/* $worksheet_aps43 = $spreadsheet_aps->getSheetByName('3b7');
+$worksheet_aps43->fromArray($data_produk_dtps_diadopsi, NULL, 'B6');
+
+$highestRow_aps43 = $worksheet_aps43->getHighestRow();
+
+$worksheet_aps43->getStyle('A6:E'.$highestRow_aps43)->applyFromArray($styleBorder);
+$worksheet_aps43->getStyle('B6:E'.$highestRow_aps43)->applyFromArray($styleYellow);
+$worksheet_aps43->getStyle('A6:A'.$highestRow_aps43)->applyFromArray($styleCenter);
+$worksheet_aps43->getStyle('D6:E'.$highestRow_aps43)->applyFromArray($styleCenter);
+$worksheet_aps43->getStyle('B6:E'.$highestRow_aps43)->getAlignment()->setWrapText(true);
+
+foreach($worksheet_aps43->getRowDimensions() as $rd43) { 
+    $rd43->setRowHeight(-1); 
+}
+
+for($row = 6; $row <= $highestRow_aps43; $row++) {
+	$worksheet_aps43->setCellValue('A'.$row, $row-5);
+} */
+
+
+// Produk/Jasa Mahasiswa yang Diadopsi oleh Industri/Masyarakat
+/* $worksheet_aps44 = $spreadsheet_aps->getSheetByName('8f3');
+$worksheet_aps44->fromArray($data_produk_mhs_diadopsi, NULL, 'B6');
+
+$highestRow_aps44 = $worksheet_aps44->getHighestRow();
+
+$worksheet_aps44->getStyle('A6:E'.$highestRow_aps44)->applyFromArray($styleBorder);
+$worksheet_aps44->getStyle('B6:E'.$highestRow_aps44)->applyFromArray($styleYellow);
+$worksheet_aps44->getStyle('A6:A'.$highestRow_aps44)->applyFromArray($styleCenter);
+$worksheet_aps44->getStyle('D6:E'.$highestRow_aps44)->applyFromArray($styleCenter);
+$worksheet_aps44->getStyle('B6:E'.$highestRow_aps44)->getAlignment()->setWrapText(true);
+
+foreach($worksheet_aps44->getRowDimensions() as $rd44) { 
+    $rd44->setRowHeight(-1); 
+}
+
+for($row = 6; $row <= $highestRow_aps44; $row++) {
+	$worksheet_aps44->setCellValue('A'.$row, $row-5);
+} */
 
 
 $writer_aps = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet_aps, 'Xlsx');
