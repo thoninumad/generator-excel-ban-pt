@@ -10,3 +10,4 @@ Keterangan:
 3. Hasil file excel yang mengalami proses perubahan format ada di folder formatted
 4. File LKPS yang sudah terisi ada di folder result
 5. Project bisa diclone dari github.com/thoninumad/generator-excel-ban-pt
+6. Setelah diclone, bisa dirun perintah "composer install" (tanpa tanda petik) di cmd
