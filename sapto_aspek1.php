@@ -288,7 +288,7 @@ unset($spreadsheet_kerjasama_pkm2);
  * Set ke Template SAPTO
  */
 
-$spreadsheet_aps = \PhpOffice\PhpSpreadsheet\IOFactory::load('./raw/sapto_aps9 (F).xlsx');
+$spreadsheet_aps = \PhpOffice\PhpSpreadsheet\IOFactory::load('./blank/sapto_aps9.xlsx');
 
 
 // Kerjasama Tridharma Pendidikan
